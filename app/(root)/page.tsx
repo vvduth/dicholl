@@ -7,7 +7,7 @@ const Home = async () => {
       <ProductList
         data={sampleData.products}
         title="Featured Products"
-        limit={4}
+        limit={6}
       />
     </>
   );
