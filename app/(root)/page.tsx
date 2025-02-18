@@ -1,10 +1,16 @@
-import React from 'react'
-const delay = (ms : number) => new Promise(res => setTimeout(res, ms))
+import React from "react";
+import sampleData from "@/db/sample-data";
+import ProductList from "@/components/shared/product/product-list";
 const Home = async () => {
-  await delay(1000)
   return (
-    <div>Home</div>
-  )
-}
+    <>
+      <ProductList
+        data={sampleData.products}
+        title="Featured Products"
+        limit={4}
+      />
+    </>
+  );
+};
 
-export default Home
+export default Home;
