@@ -1,5 +1,5 @@
 import React from "react";
-
+import ProductCard from "./product-card";
 const ProductList = ({
   data,
   title,
@@ -9,6 +9,8 @@ const ProductList = ({
   title?: string;
   limit?: number;
 }) => {
+
+    const limitedata = limit ? data.slice(0, limit) : data;
   return (
     <div className="my-10">
       <h2 className="h2-bold mb-4">{title}</h2>
@@ -17,8 +19,11 @@ const ProductList = ({
           className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4
         gap-4"
         >
-          {data.map((product: any) => (
-            <div key={product}>{product.name}</div>
+          {limitedata.map((product: any) => (
+            <ProductCard 
+                key={product.slug}
+                product={product}
+            />
           ))}
         </div>
       ) : (

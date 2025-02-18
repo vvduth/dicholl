@@ -47,7 +47,7 @@ const sampleData = {
       brand: 'Prada',
       rating: 4.9,
       numReviews: 8,
-      stock: 7,
+      stock: 0,
       isFeatured: false,
       banner: null,
     },
