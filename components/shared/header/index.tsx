@@ -3,7 +3,7 @@ import { ShoppingCart, UserIcon } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Image from 'next/image';
-
+import ModeToggle from './mode-toggle';
 
 const Header = () => {
   return (
@@ -27,6 +27,7 @@ const Header = () => {
             </Link>
         </div>
         <div className="space-x-2">
+            <ModeToggle/>
             <Button asChild variant={"ghost"}>
                 <Link
                     href={"/cart"}
@@ -34,7 +35,7 @@ const Header = () => {
                     <ShoppingCart/> Cart
                 </Link>
             </Button>
-            <Button asChild variant={"ghost"}>
+            <Button asChild>
                 <Link
                     href={"/sign-in"}
                 >
