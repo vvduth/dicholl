@@ -1,6 +1,7 @@
 import React from 'react'
-
-const Home = () => {
+const delay = (ms : number) => new Promise(res => setTimeout(res, ms))
+const Home = async () => {
+  await delay(1000)
   return (
     <div>Home</div>
   )
