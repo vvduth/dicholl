@@ -21,7 +21,7 @@ model Product {
   category    String
   images      String[]
   brand       String
-  description String?
+  description String
   price       Decimal  @default(0) @db.Decimal(12, 2)
   rating      Decimal  @default(0) @db.Decimal(3, 2)
   stock       Int
