@@ -5,7 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -21,11 +22,11 @@ model Product {
   images      String[]
   brand       String
   description String?
-  price       Decimal @default(0) @db.Decimal(12, 2)
-  rating      Decimal @default(0) @db.Decimal(3, 2)
+  price       Decimal  @default(0) @db.Decimal(12, 2)
+  rating      Decimal  @default(0) @db.Decimal(3, 2)
   stock       Int
-  numReviews  Int     @default(0)
-  isFeatured  Boolean @default(false)
+  numReviews  Int      @default(0)
+  isFeatured  Boolean  @default(false)
   banner      String?
   createdAt   DateTime @default(now()) @db.Timestamp(6)
 }
