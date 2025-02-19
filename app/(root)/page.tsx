@@ -1,11 +1,13 @@
 import React from "react";
-import sampleData from "@/db/sample-data";
+import { getLatestProducts } from "@/lib/actions/product.action";
 import ProductList from "@/components/shared/product/product-list";
 const Home = async () => {
+
+  const latestProduct = await getLatestProducts();
   return (
     <>
       <ProductList
-        data={sampleData.products}
+        data={latestProduct}
         title="Featured Products"
         limit={6}
       />
