@@ -26,5 +26,5 @@ export async function signInWithCredentials(prevState: unknown, formdata: FormDa
 // sign out user
 export async function signOutUser() {  
     await signOut()
-    return {success: true, message: 'Sign out successful'}  
+    //return {success: true, message: 'Sign out successful'}  
  }
