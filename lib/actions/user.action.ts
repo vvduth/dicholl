@@ -11,15 +11,15 @@ export async function signInWithCredentials(prevState: unknown, formdata: FormDa
             email: formdata.get('email') as string,
             password: formdata.get('password') as string
         })
-
-        await signIn('credentials', {user})
+        
+        await signIn('credentials', user)
         return {success: true, message: 'Sign in successful'}
     } catch (error) {
         if (isRedirectError(error)) {
             throw error
         }
 
-        return {success: false, message: "Invalud email or password"}
+        return {success: false, message: "Invalid email or password"}
     }
 }
 
