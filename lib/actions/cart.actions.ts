@@ -9,20 +9,20 @@ import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
 
 const calPrice = (items: CartItem[]) => {
-    const itemsPrice = roundToTwo(
+  const itemsPrice = roundToTwo(
       items.reduce((acc, item) => acc + Number(item.price) * item.qty, 0)
     ),
     shippingPrice = itemsPrice > 100 ? 0 : 10,
     taxPrice = roundToTwo(itemsPrice * 0.15),
     totalPrice = roundToTwo(itemsPrice + shippingPrice + taxPrice);
 
-    return  {
-        itemsPrice : itemsPrice.toFixed(2),
-        shippingPrice: shippingPrice.toFixed(2),
-        taxPrice: taxPrice.toFixed(2),
-        totalPrice: totalPrice.toFixed(2),
-    }
+  return {
+    itemsPrice: itemsPrice.toFixed(2),
+    shippingPrice: shippingPrice.toFixed(2),
+    taxPrice: taxPrice.toFixed(2),
+    totalPrice: totalPrice.toFixed(2),
   };
+};
 export async function addToCart(data: CartItem) {
   try {
     // check for the cart cookie
@@ -45,66 +45,68 @@ export async function addToCart(data: CartItem) {
     const product = await prisma.product.findFirst({
       where: { id: item.productId },
     });
-    if (!product) { 
-        throw new Error("Product not found");
-
+    if (!product) {
+      throw new Error("Product not found");
     }
 
     if (!cart) {
-        // create cart
-        const newCart = insertCartSchema.parse({
-          userId: userId,
-          items: [item],
-          sessionCartId: sessioncartId,
-          ...calPrice([item]),
-        });
+      // create cart
+      const newCart = insertCartSchema.parse({
+        userId: userId,
+        items: [item],
+        sessionCartId: sessioncartId,
+        ...calPrice([item]),
+      });
 
-        
-        await prisma.cart.create({
-            data: newCart,
-        })
+      await prisma.cart.create({
+        data: newCart,
+      });
 
-        // revalidate the product page
-        revalidatePath(`/product/${product.slug}`);
-        return {
-            success: true,
-            message: `${product.name} added to cart`,
-        };
+      // revalidate the product page
+      revalidatePath(`/product/${product.slug}`);
+      return {
+        success: true,
+        message: `${product.name} added to cart`,
+      };
     } else {
-        // check if tem is already in the cart
-        const existItem = (cart.items as CartItem[]).find((x) => x.productId === item.productId);
-        if (existItem) {
-            // check the stock 
-            if (product.stock < existItem.qty + 1) {
-                throw new Error("Product out of stock");
-            }
-            // increase the qty
-            (cart.items as CartItem[]).find((x) => x.productId === item.productId)!.qty = existItem.qty + 1;
-        } else {
-            // If item not existing
-            // check the stock
-            if (product.stock < 1) {
-                throw new Error("Product out of stock");
-            }
-            // add item to the cart.items
-            cart.items.push(item);
-
-            
+      // check if tem is already in the cart
+      const existItem = (cart.items as CartItem[]).find(
+        (x) => x.productId === item.productId
+      );
+      if (existItem) {
+        // check the stock
+        if (product.stock < existItem.qty + 1) {
+          throw new Error("Product out of stock");
         }
-        // save to the db
-        await prisma.cart.update({
-            where: {id: cart.id},
-            data: {
-                items: cart.items as Prisma.CartUpdateitemsInput[],
-                ...calPrice(cart.items as CartItem[]),
-            }
-        })
-
-        revalidatePath(`/product/${product.slug}`);
-        return {
-            success: true,
-            message: `${product.name} ${existItem ? 'updated in' : 'added to'} cart`,
+        // increase the qty
+        (cart.items as CartItem[]).find(
+          (x) => x.productId === item.productId
+        )!.qty = existItem.qty + 1;
+      } else {
+        // If item not existing
+        // check the stock
+        if (product.stock < 1) {
+          throw new Error("Product out of stock");
         }
+        // add item to the cart.items
+        cart.items.push(item);
+      }
+      // save to the db
+      await prisma.cart.update({
+        where: { id: cart.id },
+        data: {
+          items: cart.items as Prisma.CartUpdateitemsInput[],
+          ...calPrice(cart.items as CartItem[]),
+        },
+      });
+
+      revalidatePath(`/product/${product.slug}`);
+      return {
+        success: true,
+        message: `${product.name} ${
+          existItem ? "updated in" : "added to"
+        } cart`,
+      };
     }
   } catch (error) {
     return {
@@ -145,15 +147,65 @@ export async function getMycart() {
   });
 }
 
-
 export async function removeFromCart(productId: string) {
-    try {
-        
-    } catch (error) {
-        return {
-            success: false,
-            message: formatError(error),
-        }
-        
+  try {
+    // cehck for the cart cookie
+    const sessioncartId = (await cookies()).get("sessionCartId")?.value;
+    if (!sessioncartId) {
+      throw new Error("No cart found");
     }
+
+    const product = await prisma.product.findFirst({
+      where: { id: productId },
+    });
+
+    if (!product) {
+      throw new Error("Product not found");
+    }
+
+    // get user cart
+    const cart = await getMycart();
+    if (!cart) {
+      throw new Error("Cart not found");
+    }
+
+    // check if item is in the cart
+    const exist = (cart.items as CartItem[]).find(
+      (x) => x.productId === productId
+    );
+    if (!exist) {
+      throw new Error("Product not in cart");
+    }
+
+    // checkthe qty
+    if (exist.qty > 1) {
+      // decrease the qty
+      (cart.items as CartItem[]).find((x) => x.productId === productId)!.qty =
+        exist.qty - 1;
+    } else {
+      cart.items = (cart.items as CartItem[]).filter(
+        (x) => x.productId !== productId
+      );
+    }
+
+    // Update the cart
+    await prisma.cart.update({
+      where: { id: cart.id },
+      data: {
+        items: cart.items as Prisma.CartUpdateitemsInput[],
+        ...calPrice(cart.items as CartItem[]),
+      },
+    });
+
+    revalidatePath(`/product/${product.slug}`);
+    return {
+      success: true,
+      message: `${product.name} removed from cart`,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
 }
