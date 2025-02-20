@@ -28,8 +28,8 @@ const sampleData = {
       category: "Women's Dresses",
       description: "A stunning gown perfect for evening events",
       images: [
+        "/images/sample-products/w1-2.jpg",
         "/images/sample-products/w1-1.jpg",
-        "/images/sample-products/p1-2.jpg",
       ],
       price: 199.99,
       brand: "Versace",
