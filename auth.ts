@@ -3,9 +3,8 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "./db/prisma";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compareSync } from "bcrypt-ts-edge";
-import { authConfig } from './auth.config';
+import { authConfig } from "./auth.config";
 import { cookies } from "next/headers";
-
 
 export const config = {
   pages: {
@@ -83,6 +82,32 @@ export const config = {
               name: token.name,
             },
           });
+        }
+        if (trigger === "signIn" || trigger === "signUp") {
+          const cookiesOjb = await cookies();
+          const sessionCartId = cookiesOjb.get("sessionCartId")?.value;
+
+          if (sessionCartId) {
+            const sessioncart = await prisma.cart.findFirst({
+              where: { sessionCartId },
+            });
+
+            if (sessioncart) {
+
+              await prisma.cart.deleteMany({
+                where: {userId: user.id}
+              })
+              // assugn new card
+              await prisma.cart.update({
+                where: {
+                  id: sessioncart.id,
+                },
+                data: {
+                  userId: user.id,
+                },
+              })
+            }
+          }
         }
       }
 
