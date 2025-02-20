@@ -30,10 +30,24 @@ export function formatError(error: any) {
     error.code === "P2002"
   ) {
     // prisma error
-    const field = error.meta?.target ? error.meta.target[0]: "Field";
+    const field = error.meta?.target ? error.meta.target[0] : "Field";
     return `${field} already exists`;
   } else {
     // other
-    return typeof error.message === "string" ? error.message : "An error occurred";
+    return typeof error.message === "string"
+      ? error.message
+      : "An error occurred";
+  }
+}
+
+// rounde numebr to 2 decimal places
+export function roundToTwo(value: number | string): number {
+  if (typeof value === "string") {
+    value = parseFloat(value);
+    return Math.round((value + Number.EPSILON) * 100) / 100;
+  } else if (typeof value === "number") {
+    return Math.round((value + Number.EPSILON) * 100) / 100;
+  } else {
+    throw new Error("Invalid value");
   }
 }
