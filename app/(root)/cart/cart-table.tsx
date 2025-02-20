@@ -4,9 +4,10 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { useTransition } from "react";
-import AddToCart from "@/components/shared/product/add-to-cart";
+import { formatCurrency } from "@/lib/utils";
+import { Card, CardContent } from "@/components/ui/card";
 import { addToCart, removeFromCart } from "@/lib/actions/cart.actions";
-import { Minus, Plus, Loader } from "lucide-react";
+import { Minus, Plus, Loader, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -109,11 +110,32 @@ const CartTable = ({ cart }: { cart?: Cart }) => {
                           )}
                         </Button>
                       </TableCell>
+                        <TableCell className="text-right">
+                            {formatCurrency(item.price)}
+                        </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
             </div>
+            <Card>
+                <CardContent className="p-4 gap-4">
+                    <div className="pb-3 text-xl">
+                        Subtotal ({cart.items.reduce((a, c) => a + c.qty, 0)} items):{" "}
+                        <span className="font-bold">
+                            {formatCurrency(cart.itemsPrice)}
+                        </span>
+                    </div>
+                    <Button className="w-full"
+                     disabled={isPending}
+                     onClick={() => startTransition(() => router.push("/shipping-address"))}>
+                        {isPending ? (<Loader className="w-4 h-4 animate-spin"/>) : (
+                            <ArrowRight className="h-4 w-4"/>
+                        )}
+                        Process to checkout
+                    </Button>
+                </CardContent>
+            </Card>
           </div>
         </>
       )}
