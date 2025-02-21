@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { formatNumberWithDecimal } from "./utils";
+import { PAYMENT_METHODS } from "./constants";
 
 const currency = z
   .string()
@@ -80,4 +81,11 @@ export const shippingAddressSchema = z.object({
   //phoneNumber: z.string().min(3, 'Phone number must be at least 3 characters'),
   lat: z.number().optional().nullable(),
   lng: z.number().optional().nullable(), 
+})
+
+export const paymentMethodSchema = z.object({
+  type: z.string().min(1, 'Payment method is required'),
+}).refine((data) => PAYMENT_METHODS.includes(data.type), {
+  path: ['type'],
+  message: 'Invalid payment method'
 })

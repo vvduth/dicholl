@@ -5,8 +5,23 @@ export const authConfig = {
     providers: [], // Required by NextAuthConfig type
     callbacks: {
       authorized({ request, auth }: any) {
-        
-  
+        //array of regex patterns of paths that should be allowed
+        const protectedPaths = [
+          /\/shipping-address/,
+          /\/payment-method/,
+          /\/place-order/,
+          /\/profile/,
+          /\/user\/(.*)/,
+          /\/order\/(.*)/,
+          /\/admin/,
+        ];
+
+        // get path name from request url
+        const {pathname} = request.nextUrl 
+
+        // if user is not authenticated and path is in protectedPaths
+        if (!auth && protectedPaths.some((path) => path.test(pathname))) {return false}
+
         // Check for session cart cookie
         if (!request.cookies.get('sessionCartId')) {
           // Generate new session cart id cookie
