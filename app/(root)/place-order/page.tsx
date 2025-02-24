@@ -21,6 +21,7 @@ import Image from "next/image";
 import { Car } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import PlaceOrderForm from "./place-order-form";
 
 export const metadata: Metadata = {
   title: "Place Order",
@@ -142,6 +143,7 @@ const PlaceOrderPage = async () => {
                 <div className="font-bold">Total</div>
                 <div className="font-bold">{formatCurrency(cart.totalPrice)}</div>
               </div>
+              <PlaceOrderForm/>
             </CardContent>
           </Card>
         </div>
