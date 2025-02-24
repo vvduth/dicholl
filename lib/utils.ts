@@ -78,5 +78,5 @@ export function formatId(id: string ) {
 // format date and times
 export function formatDate(date: string | Date) { 
   const d = new Date(date)
-  return d.toLocaleDateString()
+  return d.toLocaleString()
 }
