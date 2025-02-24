@@ -15,4 +15,4 @@ export const shippingAddressDefault = {
 export const PAYMENT_METHODS = process.env.PAYMENT_METHODS ? process.env.PAYMENT_METHODS.split(',') : ['PayPal', 'Stripe']
 export const DEFAULT_PAYMENT_METHOD = process.env.DEFAULT_PAYMENT_METHOD || 'Stripe'
 export const BUSSINESS_EMAIL_PAYPAL = 'sb-lekql12845993@business.example.com'
-export const PAGE_SIZE = 2
+export const PAGE_SIZE = 6
