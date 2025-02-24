@@ -70,3 +70,13 @@ export function formatCurrency(value: number |string |null) {
   }
   
 }
+// shorten UUID
+export function formatId(id: string ) {
+  return `..${id.substring(id.length - 6)}`
+}
+
+// format date and times
+export function formatDate(date: string | Date) { 
+  const d = new Date(date)
+  return d.toLocaleDateString()
+}
