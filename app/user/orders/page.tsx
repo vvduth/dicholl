@@ -4,6 +4,7 @@ import { getMyOrders } from "@/lib/actions/order.action";
 import { formatCurrency } from "@/lib/utils";
 import { formatDate } from "@/lib/utils";
 import { formatId } from "@/lib/utils";
+import Pagination from "@/components/shared/pagination";
 import Link from "next/link";
 import {
   Table,
@@ -66,6 +67,15 @@ const OrderPage = async (props: {
             ))}
           </TableBody>
         </Table>
+        {
+          orders.totalPages >= 1 && (
+            <Pagination
+              page={Number(page) || 1}
+              totalPages={orders?.totalPages}
+            
+            />
+          )
+        }
       </div>
     </div>
   );
