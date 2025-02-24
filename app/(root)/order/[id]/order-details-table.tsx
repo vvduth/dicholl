@@ -1,14 +1,17 @@
+"use client";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatCurrency, formatDate, formatId } from "@/lib/utils";
 import { Order } from "@/types";
 import Link from "next/link";
-import { format } from "path";
+import { useToast } from "@/hooks/use-toast";
 import React from "react";
 import Image from "next/image";
 import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-const OrderDetailsTables = ({ order }: { order: Order }) => {
+import { createPaypalOrder, approvePaypalOrder } from "@/lib/actions/order.action";
+import {PayPalButtons, PayPalScriptProvider, usePayPalScriptReducer} from "@paypal/react-paypal-js"
+const OrderDetailsTables = ({ order, paypalClientId }: { order: Order, paypalClientId: string }) => {
   const {
     id,
     shippingAddress,
@@ -23,6 +26,39 @@ const OrderDetailsTables = ({ order }: { order: Order }) => {
     paidAt,
     deliveredAt,
   } = order;
+
+  const {toast} = useToast()
+  const PrintLoadingState = () => {
+    const [{isPending, isRejected}] = usePayPalScriptReducer()
+    let status = ''
+    if (isPending) {
+      status = 'Loading...'
+    } else if (isRejected) {
+      status = 'Error loading PayPal'
+    }
+
+    return status ;
+  }
+
+  const handleCreatePayPalOrder = async () => {
+    const res  = await createPaypalOrder(order.id)
+    if (!res.success) {
+      toast({
+        variant: 'destructive',
+        description: res.message
+      })
+    }
+
+    return res.data
+  }
+
+  const handleApprovePayPalOrder = async (data: {orderID: string}) => {
+    const res = await approvePaypalOrder(order.id, data)
+    toast({
+      variant: res.success ? 'default' : 'destructive',
+      description: res.message
+    })
+  }
   return (
     <div>
       <h1 className="py-4 text-2xl">Order {formatId(order.id)}</h1>
@@ -116,7 +152,17 @@ const OrderDetailsTables = ({ order }: { order: Order }) => {
                 <div className="font-bold">Total</div>
                 <div className="font-bold">{formatCurrency(totalPrice)}</div>
               </div>
-              
+              {!isPaid && paymentMethod === 'PayPal' && (
+                <div>
+                  <PayPalScriptProvider options={{ "clientId": paypalClientId, currency: "EUR", }}> 
+                    <PrintLoadingState/>
+                    <PayPalButtons 
+                      createOrder={handleCreatePayPalOrder}
+                      onApprove={handleApprovePayPalOrder}
+                    />
+                  </PayPalScriptProvider>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
