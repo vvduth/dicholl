@@ -13,7 +13,8 @@ import {
 import { formatCurrency, formatDate, formatNumber } from "@/lib/utils";
 import { Table,TableBody,TableCell,TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import Link from "next/link";
-
+import Charts from "./chart";
+import { requireAdmin } from "@/lib/auth-guard";
 export const metadata: Metadata = {
   title: "Admin Dashboard",
 };
@@ -23,6 +24,8 @@ const AdminPage = async () => {
   if (session?.user?.role !== "admin") {
     throw new Error("Unauthorized");
   }
+
+  await requireAdmin();
 
   const summary = await getOrdersSummary();
   return (
@@ -93,7 +96,13 @@ const AdminPage = async () => {
           <CardHeader>
             <CardTitle>Overview</CardTitle>
           </CardHeader>
-          <CardContent></CardContent>
+          <CardContent>
+            <Charts 
+              data={{
+                salesData: summary.salesData, 
+              }}
+            />
+          </CardContent>
         </Card>
         <Card className="col-span-4">
           <CardHeader>
