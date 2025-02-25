@@ -101,3 +101,9 @@ export function formUrlQuery({
     skipNull: true
   })
 }
+
+// format number
+const NUMBER_FORMATTER = new Intl.NumberFormat("en-US")
+export function formatNumber(value: number | string | null) {
+  return NUMBER_FORMATTER.format(Number(value))
+}
