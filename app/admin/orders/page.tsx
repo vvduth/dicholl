@@ -2,7 +2,7 @@ import React from "react";
 import { auth } from "@/auth";
 import { Metadata } from "next";
 import { requireAdmin } from "@/lib/auth-guard";
-import { getAllOrders } from "@/lib/actions/order.action";
+import { deleteOrder, getAllOrders } from "@/lib/actions/order.action";
 import {
   Table,
   TableBody,
@@ -15,6 +15,7 @@ import { formatCurrency, formatDate, formatId } from "@/lib/utils";
 import Link from "next/link";
 import Pagination from "@/components/shared/pagination";
 import { Button } from "@/components/ui/button";
+import DeleteDialog from "@/components/shared/delete-dialog";
 export const metadata: Metadata = {
   title: "Admin Orders",
 };
@@ -66,6 +67,10 @@ const AdminOrderPage = async (props: {
                   </Link>
                 </Button>
                 {/* button delete */}
+                <DeleteDialog 
+                  id={order.id}
+                  action={deleteOrder}
+                />
               </TableCell>
             </TableRow>
           ))}

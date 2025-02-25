@@ -1,7 +1,14 @@
 "use client";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { formatCurrency, formatDate, formatId } from "@/lib/utils";
 import { Order } from "@/types";
 import Link from "next/link";
@@ -9,9 +16,27 @@ import { useToast } from "@/hooks/use-toast";
 import React from "react";
 import Image from "next/image";
 import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import { createPaypalOrder, approvePaypalOrder } from "@/lib/actions/order.action";
-import {PayPalButtons, PayPalScriptProvider, usePayPalScriptReducer} from "@paypal/react-paypal-js"
-const OrderDetailsTables = ({ order, paypalClientId }: { order: Order, paypalClientId: string }) => {
+import {
+  createPaypalOrder,
+  approvePaypalOrder,
+  updateOrderToDelivered,
+  updateOrderToPaidAdmin,
+} from "@/lib/actions/order.action";
+import { Button } from "@/components/ui/button";
+import {
+  PayPalButtons,
+  PayPalScriptProvider,
+  usePayPalScriptReducer,
+} from "@paypal/react-paypal-js";
+const OrderDetailsTables = ({
+  order,
+  paypalClientId,
+  isAdmin,
+}: {
+  order: Order;
+  paypalClientId: string;
+  isAdmin: boolean;
+}) => {
   const {
     id,
     shippingAddress,
@@ -27,38 +52,83 @@ const OrderDetailsTables = ({ order, paypalClientId }: { order: Order, paypalCli
     deliveredAt,
   } = order;
 
-  const {toast} = useToast()
+  const { toast } = useToast();
   const PrintLoadingState = () => {
-    const [{isPending, isRejected}] = usePayPalScriptReducer()
-    let status = ''
+    const [{ isPending, isRejected }] = usePayPalScriptReducer();
+    let status = "";
     if (isPending) {
-      status = 'Loading...'
+      status = "Loading...";
     } else if (isRejected) {
-      status = 'Error loading PayPal'
+      status = "Error loading PayPal";
     }
 
-    return status ;
-  }
+    return status;
+  };
 
   const handleCreatePayPalOrder = async () => {
-    const res  = await createPaypalOrder(order.id)
+    const res = await createPaypalOrder(order.id);
     if (!res.success) {
       toast({
-        variant: 'destructive',
-        description: res.message
-      })
+        variant: "destructive",
+        description: res.message,
+      });
     }
 
-    return res.data
-  }
+    return res.data;
+  };
 
-  const handleApprovePayPalOrder = async (data: {orderID: string}) => {
-    const res = await approvePaypalOrder(order.id, data)
+  const handleApprovePayPalOrder = async (data: { orderID: string }) => {
+    const res = await approvePaypalOrder(order.id, data);
     toast({
-      variant: res.success ? 'default' : 'destructive',
-      description: res.message
-    })
-  }
+      variant: res.success ? "default" : "destructive",
+      description: res.message,
+    });
+  };
+
+  // Buttons for mark order as paid and delivered
+  const MarkAsPaidButton = () => {
+    const [isPending, startTransition] = React.useTransition();
+    const { toast } = useToast();
+    return (
+      <Button
+        type="button"
+        disabled={isPending}
+        onClick={() => {
+          startTransition(async () => {
+            const res = await updateOrderToPaidAdmin(order.id);
+            toast({
+              variant: res.success ? "default" : "destructive",
+              description: res.message,
+            });
+          });
+        }}
+      >
+        {isPending ? "Processing..." : "Mark as Paid"}
+      </Button>
+    );
+  };
+
+  const MarkAsDeliveredButton = () => {
+    const [isPending, startTransition] = React.useTransition();
+    const { toast } = useToast();
+    return (
+      <Button
+        type="button"
+        disabled={isPending}
+        onClick={() => {
+          startTransition(async () => {
+            const res = await updateOrderToDelivered(order.id);
+            toast({
+              variant: res.success ? "default" : "destructive",
+              description: res.message,
+            });
+          });
+        }}
+      >
+        {isPending ? "Processing..." : "Mark as Delivered"}
+      </Button>
+    );
+  };
   return (
     <div>
       <h1 className="py-4 text-2xl">Order {formatId(order.id)}</h1>
@@ -81,13 +151,14 @@ const OrderDetailsTables = ({ order, paypalClientId }: { order: Order, paypalCli
             <CardContent className="p-4 gap-4">
               <h2 className="text-xl pb-4">Shipping address</h2>
               <p>{shippingAddress.fullName}</p>
-              <p>{shippingAddress.streetAddress}, {shippingAddress.city} <br/>
+              <p>
+                {shippingAddress.streetAddress}, {shippingAddress.city} <br />
                 {shippingAddress.postalCode}, {shippingAddress.country}
               </p>
-              
+
               {isDelivered ? (
                 <Badge variant={"secondary"}>
-                  Paid at {formatDate(paidAt!)}
+                  Delivered at {formatDate(paidAt!)}
                 </Badge>
               ) : (
                 <Badge variant={"destructive"}>Not delivered</Badge>
@@ -96,8 +167,8 @@ const OrderDetailsTables = ({ order, paypalClientId }: { order: Order, paypalCli
           </Card>
           <Card>
             <CardContent className="p-4 gap-4">
-                <h2 className="text-xl pb-4">Order items</h2>
-                <Table>
+              <h2 className="text-xl pb-4">Order items</h2>
+              <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Item</TableHead>
@@ -109,8 +180,9 @@ const OrderDetailsTables = ({ order, paypalClientId }: { order: Order, paypalCli
                   {orderitems.map((item) => (
                     <TableRow key={item.slug}>
                       <TableCell>
-                        <Link href={`/products/${item.slug}`}
-                         className="flex items-center"
+                        <Link
+                          href={`/products/${item.slug}`}
+                          className="flex items-center"
                         >
                           <Image
                             src={item.image}
@@ -147,22 +219,27 @@ const OrderDetailsTables = ({ order, paypalClientId }: { order: Order, paypalCli
                 <div>Shipping</div>
                 <div>{formatCurrency(shippingPrice)}</div>
               </div>
-              <DropdownMenuSeparator/>
+              <DropdownMenuSeparator />
               <div className="flex justify-between">
                 <div className="font-bold">Total</div>
                 <div className="font-bold">{formatCurrency(totalPrice)}</div>
               </div>
-              {!isPaid && paymentMethod === 'PayPal' && (
+              {!isPaid && paymentMethod === "PayPal" && (
                 <div>
-                  <PayPalScriptProvider options={{ "clientId": paypalClientId, currency: "EUR", }}> 
-                    <PrintLoadingState/>
-                    <PayPalButtons 
+                  <PayPalScriptProvider
+                    options={{ clientId: paypalClientId, currency: "EUR" }}
+                  >
+                    <PrintLoadingState />
+                    <PayPalButtons
                       createOrder={handleCreatePayPalOrder}
                       onApprove={handleApprovePayPalOrder}
                     />
                   </PayPalScriptProvider>
                 </div>
               )}
+              {/* manage order */}
+              {isAdmin && !isPaid && <MarkAsPaidButton />}
+              {isAdmin && isPaid && !isDelivered && <MarkAsDeliveredButton />}
             </CardContent>
           </Card>
         </div>

@@ -67,7 +67,7 @@ const AdminPage = async () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {formatNumber(summary.ordercount)}
+              {formatNumber(summary.usersCount)}
             </div>
           </CardContent>
         </Card>
