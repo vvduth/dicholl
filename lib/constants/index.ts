@@ -16,3 +16,17 @@ export const PAYMENT_METHODS = process.env.PAYMENT_METHODS ? process.env.PAYMENT
 export const DEFAULT_PAYMENT_METHOD = process.env.DEFAULT_PAYMENT_METHOD || 'Stripe'
 export const BUSSINESS_EMAIL_PAYPAL = 'sb-lekql12845993@business.example.com'
 export const PAGE_SIZE = 6
+export const productDefaultValue = {
+    name: "",
+    description: "",
+    price: '0',
+    stock: 0,
+    brand: "",
+    category: "",
+    images: [],
+    rating: '0',
+    numReviews: '0',
+    slug: "",
+    isFeatured: false,
+    banner: null,
+}
