@@ -3,6 +3,7 @@ import Link from "next/link";
 import Menu from "@/components/shared/header/menu";
 import MainNav from "./main-nav";
 import { Input } from "@/components/ui/input";
+import AdminSearch from "./admin-search";
 export default function AdminLayout({
   children,
 }: Readonly<{
@@ -25,13 +26,9 @@ export default function AdminLayout({
              className="mx-6"
             />
             <div className="ml-auto items-center flex space-x-4">
-              <div>
-                <Input
-                type="search"
-                placeholder="Search..."
-                  className="md:w-[100px] lg:w-[300px]"
-                />
-              </div>
+              
+              <AdminSearch  />
+              
               <Menu />
             </div>
           </div>
