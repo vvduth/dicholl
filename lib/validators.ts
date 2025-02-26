@@ -134,3 +134,11 @@ export const updateProfileSchema = z.object({
   email: z.string().min(3, 'Invalid email address'), 
 })
 
+
+// schema to update users
+export const updateUserSchema = updateProfileSchema.extend({ 
+  id: z.string().min(1, 'Id is required'),
+  //: z.string().min(1, 'Id is required'),
+  role: z.string().min(1, 'role is required'),
+  
+ })

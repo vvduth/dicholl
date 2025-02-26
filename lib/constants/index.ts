@@ -1,3 +1,4 @@
+
 import { count } from "console"
 
 export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'Dichol'
@@ -30,3 +31,5 @@ export const productDefaultValue = {
     isFeatured: false,
     banner: null,
 }
+
+export const USER_ROLE = ['user', 'admin'];
