@@ -22,14 +22,27 @@ export const metadata: Metadata = {
   description: "User Page",
 };
 const AdminUserPage = async (props: {
-  searchParams: Promise<{ page: string }>;
+  searchParams: Promise<{ 
+    page: string ;
+    query: string;
+  }>;
 }) => {
   await requireAdmin();
-  const { page = "1" } = await props.searchParams;
-  const users = await getAllUsers({ page: Number(page) });
+  const { page = "1", query: searchtext } = await props.searchParams;
+  const users = await getAllUsers({ page: Number(page), query: searchtext });
   return (
     <div className="space-y-2">
       <h2 className="h2-bold">Users</h2>
+      {searchtext && (
+            <div>
+              Search results for <strong>{searchtext}</strong>
+              <Link href="/admin/users">
+                <Button  variant={"outline"} size={"sm"}>
+                  Clear search
+                </Button>
+              </Link>
+            </div>
+          )}
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
@@ -47,14 +60,13 @@ const AdminUserPage = async (props: {
                 <TableCell>{formatId(user.id)}</TableCell>
                 <TableCell>{user.name}</TableCell>
                 <TableCell>{user.email}</TableCell>
-                <TableCell>{user.role === 'user' ? 
-                (<Badge
-                  variant={"secondary"}
-                >User</Badge>) : (
-                  <Badge
-                    variant={"default"}
-                  >Admin</Badge>
-                )}</TableCell>
+                <TableCell>
+                  {user.role === "user" ? (
+                    <Badge variant={"secondary"}>User</Badge>
+                  ) : (
+                    <Badge variant={"default"}>Admin</Badge>
+                  )}
+                </TableCell>
                 <TableCell>
                   <Button asChild variant={"outline"} size={"sm"}>
                     <Link href={`/admin/users/${user.id}`}>
@@ -62,7 +74,7 @@ const AdminUserPage = async (props: {
                     </Link>
                   </Button>
                   {/* button delete */}
-                   <DeleteDialog id={user.id} action={deleteUser} /> 
+                  <DeleteDialog id={user.id} action={deleteUser} />
                 </TableCell>
               </TableRow>
             ))}

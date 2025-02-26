@@ -15,6 +15,7 @@ import { ShippingAddress } from "@/types";
 import { z } from "zod";
 import { PAGE_SIZE } from "../constants";
 import { revalidatePath } from "next/cache";
+import { Prisma } from "@prisma/client";
 
 // sign in user with credentials
 
@@ -138,7 +139,7 @@ export async function updateUserPaymentMethod(
     if (!currentUser) throw new Error("User not found");
 
     const paymentMethod = paymentMethodSchema.parse(data);
-    
+
     await prisma.user.update({
       where: {
         id: currentUser.id,
@@ -148,68 +149,80 @@ export async function updateUserPaymentMethod(
       },
     });
 
-    return { success: true, message: "User Payment method updated successfully" };
+    return {
+      success: true,
+      message: "User Payment method updated successfully",
+    };
   } catch (error) {
-    
     return { success: false, message: formatError(error) };
   }
 }
 
 // update user profile
-export async function updateProfile(user: {
-  name: string, 
-  email: string, 
-}) {
+export async function updateProfile(user: { name: string; email: string }) {
   try {
-    const session = await auth()
+    const session = await auth();
     const currentUser = await prisma.user.findUnique({
       where: {
-        id: session?.user?.id
-      }
-    })
+        id: session?.user?.id,
+      },
+    });
     if (!currentUser) {
-      throw new Error("User not found")
+      throw new Error("User not found");
     }
 
     await prisma.user.update({
       where: {
-        id: currentUser.id
+        id: currentUser.id,
       },
       data: {
-        name: user.name
-      }
-    })
+        name: user.name,
+      },
+    });
 
     return {
-      success: true, 
-      message: "Profile updated successfully" 
-    }
+      success: true,
+      message: "Profile updated successfully",
+    };
   } catch (error) {
     return { success: false, message: formatError(error) };
   }
 }
 
 // get all users
-export async function getAllUsers(
-  {limit = PAGE_SIZE,
-  page }: {
-    limit?: number,
-    page: number
-  }
-) {
+export async function getAllUsers({
+  limit = PAGE_SIZE,
+  page,
+  query,
+}: {
+  limit?: number;
+  page: number;
+  query: string;
+}) {
+  const queryFilter: Prisma.UserWhereInput =
+    query && query !== "all"
+      ? {
+          name: {
+            contains: query,
+            mode: "insensitive",
+          } as Prisma.StringFilter,
+        }
+      : {};
   const users = await prisma.user.findMany({
+    where: queryFilter,
     orderBy: {
-      createdAt: 'desc'    },
+      createdAt: "desc",
+    },
     take: limit,
-    skip: (page - 1) * limit
+    skip: (page - 1) * limit,
   });
-  
+
   const dataCount = await prisma.user.count();
 
   return {
     data: users,
-    totalPages: Math.ceil(dataCount / limit)
-  }
+    totalPages: Math.ceil(dataCount / limit),
+  };
 }
 
 // Delete a user
@@ -217,42 +230,42 @@ export async function deleteUser(userId: string) {
   try {
     await prisma.user.delete({
       where: {
-        id: userId
-      }
-    })
+        id: userId,
+      },
+    });
 
-    revalidatePath("/admin/users")
+    revalidatePath("/admin/users");
     return {
       success: true,
-      message: "User deleted successfully"
-    }
+      message: "User deleted successfully",
+    };
   } catch (error) {
     return { success: false, message: formatError(error) };
   }
 }
 
 // update user
-export async function updateUser(user:z.infer<typeof updateUserSchema>) {
+export async function updateUser(user: z.infer<typeof updateUserSchema>) {
   try {
     await prisma.user.update({
       where: {
-        id: user.id
+        id: user.id,
       },
       data: {
         name: user.name,
-        role: user.role
-      }
-    })
+        role: user.role,
+      },
+    });
 
-    revalidatePath("/admin/users")
+    revalidatePath("/admin/users");
     return {
       success: true,
-      message: "User updated successfully"
-    }
+      message: "User updated successfully",
+    };
   } catch (error) {
     return {
       success: false,
-      message: formatError(error)
-    }
+      message: formatError(error),
+    };
   }
 }
