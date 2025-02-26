@@ -3,7 +3,7 @@ import React from "react";
 import Link from "next/link";
 
 import Image from "next/image";
-
+import CategoryDrawer from "./category-drawer";
 import Menu from "./menu";
 
 const Header = () => {
@@ -14,7 +14,8 @@ const Header = () => {
     >
       <div className="wrapper flex-between">
         <div className="flex-start">
-          <Link href="/" className="flex-start">
+          <CategoryDrawer />
+          <Link href="/" className="flex-start ml-4">
             <Image
               src="/images/logo.svg"
               alt="Logo"
@@ -27,9 +28,8 @@ const Header = () => {
             </span>
           </Link>
         </div>
-      
-          <Menu />
-        
+
+        <Menu />
       </div>
     </header>
   );
