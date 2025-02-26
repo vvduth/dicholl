@@ -30,7 +30,7 @@ export async function getProductBySlug(slug: string) {
 
 // get product by id
 export async function getProductById(id: string) {
-  const data =  await prisma.product.findFirst({
+  const data = await prisma.product.findFirst({
     where: {
       id,
     },
@@ -42,6 +42,9 @@ export async function getProductById(id: string) {
 // get all products admin
 export async function getAllProducts({
   query,
+  price,
+  rating,
+  sort,
   limit = PAGE_SIZE,
   page,
   category,
@@ -50,6 +53,9 @@ export async function getAllProducts({
   limit?: number;
   page: number;
   category?: string;
+  price?: string;
+  rating?: string;
+  sort?: string;
 }) {
   const data = await prisma.product.findMany({
     skip: (page - 1) * limit,
@@ -62,7 +68,8 @@ export async function getAllProducts({
       category: {
         contains: category,
         mode: "insensitive",
-    }}
+      },
+    },
   });
 
   const dataCount = await prisma.product.count();
@@ -126,48 +133,47 @@ export async function createProduct(data: z.infer<typeof insertProductSchema>) {
 
 // update a products
 export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
-    try {
-      const product = updateProductSchema.parse(data);
-      
-      const productExist = await prisma.product.findFirst({ 
-        where: {
-            id: product.id
-        }
-      })
+  try {
+    const product = updateProductSchema.parse(data);
 
-      if (!productExist) {
-          throw new Error('Product not found')
-      }
+    const productExist = await prisma.product.findFirst({
+      where: {
+        id: product.id,
+      },
+    });
 
-      await prisma.product.update({
-        where: {
-          id: product.id
-        },
-        data: product
-      });
-  
-      revalidatePath("/admin/products");
-      return {
-        success: true,
-        message: "Product updated successfully",
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: formatError(error),
-      };
+    if (!productExist) {
+      throw new Error("Product not found");
     }
-  }
 
+    await prisma.product.update({
+      where: {
+        id: product.id,
+      },
+      data: product,
+    });
+
+    revalidatePath("/admin/products");
+    return {
+      success: true,
+      message: "Product updated successfully",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
+}
 
 // get all categories
 export async function getAllCategories() {
-  const data =  await prisma.product.groupBy({
+  const data = await prisma.product.groupBy({
     by: ["category"],
     _count: true,
-  })
+  });
 
-  return data; 
+  return data;
 }
 
 // get products that are featured
@@ -175,10 +181,10 @@ export async function getFeaturedProducts() {
   const data = await prisma.product.findMany({
     where: {
       isFeatured: true,
-
     },
     orderBy: {
-      createdAt: "desc",},
+      createdAt: "desc",
+    },
     take: 4,
   });
 
