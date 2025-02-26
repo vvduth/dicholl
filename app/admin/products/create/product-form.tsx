@@ -23,6 +23,8 @@ import { createProduct, updateProduct } from "@/lib/actions/product.action";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { UploadButton } from "@/lib/uploadthing";
+import { DropdownMenuCheckboxItem } from "@/components/ui/dropdown-menu";
+import { Checkbox } from "@/components/ui/checkbox";
 const ProductForm = ({
   type,
   product,
@@ -83,6 +85,8 @@ const ProductForm = ({
   };
 
   const images = form.watch("images");
+  const isFeatured = form.watch("isFeatured");
+  const banner = form.watch("banner");
   return (
     <Form {...form}>
       <form
@@ -257,14 +261,14 @@ const ProductForm = ({
                         />
                       ))}
                       <FormControl>
-                        <UploadButton endpoint="imageUploader" 
-                          onClientUploadComplete={
-                            (res: {url: string}[]) => {
-                              form.setValue("images", 
-                                [...images, ...res.map((r) => r.url)]
-                              );
-                            }
-                          }
+                        <UploadButton
+                          endpoint="imageUploader"
+                          onClientUploadComplete={(res: { url: string }[]) => {
+                            form.setValue("images", [
+                              ...images,
+                              ...res.map((r) => r.url),
+                            ]);
+                          }}
                           onUploadError={(err: Error) => {
                             toast({
                               title: "Error",
@@ -281,7 +285,54 @@ const ProductForm = ({
             )}
           />
         </div>
-        <div className="upload-field">{/* is featured */}</div>
+        <div className="upload-field">
+          {/* is featured */}
+          Featured Products
+          <Card>
+            <CardContent className="space-y-2 mt-2">
+              <FormField
+                control={form.control}
+                name="isFeatured"
+                render={({ field }) => (
+                  <FormItem className="space-x-2 items-center">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormLabel>Is featured</FormLabel>
+                  </FormItem>
+                )}
+              />
+              {isFeatured && banner && (
+                <Image
+                  alt="banner"
+                  className="w-full object-cover object-center rounded-sm"
+                  width={1920}
+                  height={680}
+                  src={banner}
+                />
+              )}
+
+              {isFeatured && !banner && (
+                <UploadButton
+                  endpoint={"imageUploader"}
+                  onClientUploadComplete={(res: { url: string }[]) => {
+                    form.setValue("banner", res[0].url);
+                  }}
+                  onUploadError={(err: Error) => {
+                    toast({
+                      title: "Error",
+                      description: `${err}`,
+                      variant: "destructive",
+                    });
+                  }}
+                />
+              )}
+            </CardContent>
+          </Card>
+        </div>
         <div>
           {/* Desc */}
           <FormField
