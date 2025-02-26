@@ -20,6 +20,9 @@ import slugify from "slugify";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { createProduct, updateProduct } from "@/lib/actions/product.action";
+import { Card, CardContent } from "@/components/ui/card";
+import Image from "next/image";
+import { UploadButton } from "@/lib/uploadthing";
 const ProductForm = ({
   type,
   product,
@@ -78,6 +81,8 @@ const ProductForm = ({
       }
     }
   };
+
+  const images = form.watch("images");
   return (
     <Form {...form}>
       <form
@@ -231,6 +236,50 @@ const ProductForm = ({
         </div>
         <div className="flex flex-col gap-5 md:flex-row upload-field">
           {/* images */}
+          <FormField
+            control={form.control}
+            name="images"
+            render={() => (
+              <FormItem className="w-full">
+                <FormLabel>Images</FormLabel>
+                <Card>
+                  <CardContent className="space-y-2 mt-2 min-h-48">
+                    <div className="flex-start space-x-2">
+                      {images.map((image: string, index) => (
+                        <Image
+                          key={index}
+                          src={image}
+                          width={100}
+                          height={100}
+                          className="w-20 h-20 object-cover 
+                        object-center rounded-sm"
+                          alt="product image"
+                        />
+                      ))}
+                      <FormControl>
+                        <UploadButton endpoint="imageUploader" 
+                          onClientUploadComplete={
+                            (res: {url: string}[]) => {
+                              form.setValue("images", 
+                                [...images, ...res.map((r) => r.url)]
+                              );
+                            }
+                          }
+                          onUploadError={(err: Error) => {
+                            toast({
+                              title: "Error",
+                              description: `${err}`,
+                              variant: "destructive",
+                            });
+                          }}
+                        />
+                      </FormControl>
+                    </div>
+                  </CardContent>
+                </Card>
+              </FormItem>
+            )}
+          />
         </div>
         <div className="upload-field">{/* is featured */}</div>
         <div>

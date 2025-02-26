@@ -112,3 +112,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+/* upload thing btn text */
+html.dark .upload-field .text-white {
+  color: white !important;
+}
+
+.upload-field .text-white {
+  color: black !important;
+}
