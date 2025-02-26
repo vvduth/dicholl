@@ -2,6 +2,7 @@ import React from "react";
 import { getFeaturedProducts, getLatestProducts } from "@/lib/actions/product.action";
 import ProductList from "@/components/shared/product/product-list";
 import ProductCarousel from "@/components/shared/product/product-carousel";
+import ViewAllProductsButton from "@/components/view-all-products-button";
 const Home = async () => {
 
   const latestProduct = await getLatestProducts();
@@ -14,6 +15,7 @@ const Home = async () => {
         title="Featured Products"
         limit={6}
       />
+      <ViewAllProductsButton />
     </>
   );
 };
