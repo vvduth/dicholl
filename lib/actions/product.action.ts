@@ -28,6 +28,17 @@ export async function getProductBySlug(slug: string) {
   });
 }
 
+// get product by id
+export async function getProductById(id: string) {
+  const data =  await prisma.product.findFirst({
+    where: {
+      id,
+    },
+  });
+
+  return covertoPlainObj(data);
+}
+
 // get all products admin
 export async function getAllProducts({
   query,
