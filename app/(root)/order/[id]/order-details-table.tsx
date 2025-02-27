@@ -28,14 +28,17 @@ import {
   PayPalScriptProvider,
   usePayPalScriptReducer,
 } from "@paypal/react-paypal-js";
+import StripePayment from "./stripe-payment";
 const OrderDetailsTables = ({
   order,
   paypalClientId,
   isAdmin,
+  stripeClientSecret
 }: {
   order: Order;
   paypalClientId: string;
   isAdmin: boolean;
+  stripeClientSecret: string | null;
 }) => {
   const {
     id,
@@ -236,6 +239,13 @@ const OrderDetailsTables = ({
                     />
                   </PayPalScriptProvider>
                 </div>
+              )}
+              {!isPaid && paymentMethod === "Stripe" && stripeClientSecret && (
+                <StripePayment 
+                  priceInCents={Math.round(Number(totalPrice) * 100)}
+                  orderId={order.id}
+                  clientSecret={stripeClientSecret}
+                />
               )}
               {/* manage order */}
               {isAdmin && !isPaid && <MarkAsPaidButton />}
