@@ -29,7 +29,7 @@ import { reviewFormDefaultValue } from "@/lib/constants";
 import { insertReviewSchema } from "@/lib/validators";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { StarIcon } from "lucide-react";
-import { createUpdateReview } from "@/lib/actions/review.actions";
+import { createUpdateReview, getOneReview } from "@/lib/actions/review.actions";
 import React from "react";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -51,10 +51,17 @@ const ReviewForm = ({
   });
 
   // open form handler
-  const handleOpenForm = () => {
+  const handleOpenForm = async () => {
 
     form.setValue('productId', productId);
     form.setValue('userId', userId);
+
+    const review = await getOneReview({productId})
+    if (review) {
+      form.setValue('title', review.title);
+      form.setValue('description', review.description);
+      form.setValue('rating', review.rating);
+    }
     setOpen(true);
   };
 
