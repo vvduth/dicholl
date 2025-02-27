@@ -14,6 +14,10 @@ const ReviewList = ({
   productSlug: string;
 }) => {
   const [reviews, setReviews] = useState<Review[]>([]);
+
+  const reload = () => {
+    console.log("reload");
+  }
   return (
     <div className="space-y-4">
       {reviews.length === 0 && (
@@ -21,13 +25,11 @@ const ReviewList = ({
       )}
 
       {userId ? (
-        <>
-          <ReviewForm
-            userId={userId}
-            productId={productId}
-            onReviewSubmitted={() => {}}
-          />
-        </>
+        <><ReviewForm
+          userId={userId}
+          productId={productId}
+          onReviewSubmitted={reload}
+        /></>
       ) : (
         <div>
           Please{" "}

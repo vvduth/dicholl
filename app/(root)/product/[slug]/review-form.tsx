@@ -29,10 +29,10 @@ import { reviewFormDefaultValue } from "@/lib/constants";
 import { insertReviewSchema } from "@/lib/validators";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { StarIcon } from "lucide-react";
-
+import { createUpdateReview } from "@/lib/actions/review.actions";
 import React from "react";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 const ReviewForm = ({
   userId,
@@ -50,8 +50,32 @@ const ReviewForm = ({
     defaultValues: reviewFormDefaultValue,
   });
 
+  // open form handler
   const handleOpenForm = () => {
+
+    form.setValue('productId', productId);
+    form.setValue('userId', userId);
     setOpen(true);
+  };
+
+  // submit form handler
+  const onSubmit: SubmitHandler<z.infer<typeof insertReviewSchema>> = async (
+    values
+  ) => {
+    const res = await createUpdateReview({ ...values, productId });
+    if (!res.success) {
+        toast({
+            title: "Error",
+            description: res.message,
+           variant:"destructive"
+        });
+    }
+    setOpen(false);
+    onReviewSubmitted();
+    toast({
+        description:res.message,
+        title:"Success",
+    })
   };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -60,7 +84,7 @@ const ReviewForm = ({
       </Button>
       <DialogContent className="sm:max-w-[425px]">
         <Form {...form}>
-          <form method="POST">
+          <form method="POST" onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader>
               <DialogTitle>Write a review</DialogTitle>
               <DialogDescription>
