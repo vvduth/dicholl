@@ -8,7 +8,6 @@ import { prisma } from "@/db/prisma";
 import { revalidatePath } from "next/cache";
 
 // create and update review
-
 export async function createUpdateReview(
   data: z.infer<typeof insertReviewSchema>
 ) {
@@ -98,4 +97,44 @@ export async function createUpdateReview(
       message: formatError(error),
     };
   }
+}
+
+// get all reviews of a product
+export async function getReviews({productId}: {
+  productId: string
+}) {
+  const data = await prisma.review.findMany({
+    where: {productId: productId},
+    include: {
+      user: {
+        select: {
+          name: true,
+          email: true,
+        }
+      }
+    },
+    orderBy: {
+      createdAt: "desc"
+    }
+  })
+
+  return data;
+}
+
+
+// get one review written by a user
+export async function getOneReview({productId}: {productId: string}) {
+  const session = await auth();
+  if (!session) {
+    throw new Error("You must be logged in to write a review");
+  }
+
+  const review = await prisma.review.findFirst({
+    where: {
+      userId: session?.user?.id,
+      productId: productId,
+    },
+  });
+
+  return review;
 }

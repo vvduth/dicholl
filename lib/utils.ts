@@ -77,11 +77,17 @@ export function formatId(id: string ) {
 }
 
 // format date and times
-export function formatDate(date: string | Date) { 
+export function formatDate(date: string | Date, type?: "date" | "time") { 
   const d = new Date(date)
-  return d.toLocaleString('en-US', {
-    hour12: false,
-  })
+
+  if (type === "date") {
+    return d.toLocaleDateString('en-US')
+  } else   {
+    return d.toLocaleString('en-US', {
+      hour12: false,
+    })
+  }
+  
 }
 
 // form the pagination length 
