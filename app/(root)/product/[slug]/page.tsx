@@ -7,6 +7,8 @@ import { getMycart } from "@/lib/actions/cart.actions";
 import ProductPrice from "@/components/shared/product/product-price";
 import ProductImages from "@/components/shared/product/product-images";
 import AddToCart from "@/components/shared/product/add-to-cart";
+import ReviewList from "./review-list";
+import { auth } from "@/auth";
 
 const ProductDetailPage = async (props: {
   params: Promise<{
@@ -19,8 +21,12 @@ const ProductDetailPage = async (props: {
     return notFound();
   }
 
+  const session = await auth()
+  const userId = session?.user?.id
+
   const cart = await getMycart(); 
   return (
+   <>
     <section>
       <div className="grid grid-cols-1 md:grid-cols-5">
         {/* Images columns */}
@@ -91,6 +97,17 @@ const ProductDetailPage = async (props: {
         </div>
       </div>
     </section>
+    <section className="mt-10">
+      <h2 className="h2-bold">
+        Customer reviews
+      </h2>
+      <ReviewList
+        userId={userId || ''}
+        productId={product.id}
+        productSlug={product.slug}
+      />
+    </section>
+   </>
   );
 };
 
