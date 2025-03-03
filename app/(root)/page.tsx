@@ -3,6 +3,7 @@ import { getFeaturedProducts, getLatestProducts } from "@/lib/actions/product.ac
 import ProductList from "@/components/shared/product/product-list";
 import ProductCarousel from "@/components/shared/product/product-carousel";
 import ViewAllProductsButton from "@/components/view-all-products-button";
+import IconBoxes from "@/components/icon-boxes";
 const Home = async () => {
 
   const latestProduct = await getLatestProducts();
@@ -16,6 +17,7 @@ const Home = async () => {
         limit={6}
       />
       <ViewAllProductsButton />
+      <IconBoxes />
     </>
   );
 };
