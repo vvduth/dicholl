@@ -1,36 +1,103 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Dichol
+
+Dichol is an e-commerce platform for women's fancy dresses and accessories. This project is built using Next.js, TypeScript, and P, PostGreSQL with Neon, Prisma.
+
+## Features
+
+- Product listing with detailed descriptions
+- Product carousel for featured items
+- User authentication and authorization
+- Shopping cart and checkout process
+- Integration with PayPal and Stripe for payments
+- Admin Features such as create product, mark order as paid, assign role to user
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js (v16 or higher)
+- npm or yarn
+- PostgreSQL database
+
+### Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/vvduth/dichol.git
+   cd dichol
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+3. Set up environment variables:
+
+   Create a `.env` file in the root directory and add the following variables:
+
+   ```env
+   DATABASE_URL=your_database_url
+   NEXTAUTH_URL=http://localhost:3000
+   NEXTAUTH_SECRET=your_secret
+   STRIPE_SECRET_KEY=your_stripe_secret_key
+   PAYPAL_CLIENT_ID=your_paypal_client_id
+   ```
+
+4. Run Prisma migrations:
+
+   ```bash
+   npx prisma migrate dev
+   ```
+
+5. Generate Prisma client:
+
+   ```bash
+   npx prisma generate
+   ```
+
+### Running the Application
+
+1. Start the development server:
+
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+2. Open your browser and navigate to `http://localhost:3000`.
+
+### Running Tests
+
+To run tests, use the following command:
 
 ```bash
-npm run dev
+npm run test
 # or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+yarn test
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Building for Production
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+To build the application for production, use the following command:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+# or
+yarn build
+```
 
-## Learn More
+To start the production server:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run start
+# or
+yarn start
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
